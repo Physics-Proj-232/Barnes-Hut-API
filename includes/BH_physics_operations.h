@@ -26,7 +26,6 @@ public:
 	void update_force(const float);
 };
 
-// modifies gravitational potential of objects
 // @param softening https://en.wikipedia.org/wiki/Softening
 // @param b pointer to Float4 object that enacts force on object calling function
 void Float4::add_force(Float4 *obj, const float softening) {
