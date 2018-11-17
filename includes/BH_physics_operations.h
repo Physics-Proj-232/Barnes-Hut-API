@@ -1,5 +1,6 @@
 #include <cmath> // copysign(), sqrtf()
 
+//
 // gravitational constant
 const float G = 6.673e-11;
 
