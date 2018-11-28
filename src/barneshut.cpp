@@ -74,6 +74,32 @@ BarnesHutNode::BarnesHutNode	*create_octree(size_t limit, std::vector<Body*> *ma
 	return (root);
 }
 
+BarnesHutNode::void			center_of_mass()
+{
+	size_t sumx = 0;
+	size_t sumy = 0;
+	size_t sumz = 0;
+	size_t totalmass = 0;
+	for (size_t i = this->bodystart; i < this->bodyend; i++)
+	{
+		sumx += (bodies[i]->x * bodies[i]->mass);
+		sumy += (bodies[i]->y * bodies[i]->mass);
+		sumz += (bodies[i]->z * bodies[i]->mass);
+	}
+	for (size_t j = this->bodystart; j < this->bodyend; j++)
+	{
+		totalmass += bodies[i]->mass;
+	}
+	this->cx = sumx / totalmass;
+	this->cy = sumy / totalmass;
+	this->cz = sumz / totalmass;
+}
+
+BarnesHutNode::void			adjust_velocity_node(size_t i, const double timestep, BarnesHutNode suboctant)
+{
+
+}
+
 BarnesHutNode::void			adjust_velocity(size_t i, const double timestep)
 {
 	//adjust velocity based on all particles within the same node
@@ -111,7 +137,7 @@ BarnesHutNode::BarnesHutNode	*endtree(size_t i)
 		{
 			cursor = cursor->children[l];
 			l = 0;
-			continue ;
+			continue;
 		}
 		l++;
 	}

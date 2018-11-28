@@ -6,6 +6,18 @@
 // gravitational constant
 const double G = 6.673e-11;
 
+// fast inverse square-root algorithm
+double inv_rsqrt(double n) {
+	const double threehalves = 1.5F;
+	double x2 = n * 0.5F;
+	double y = n;
+	long i = *(long *)&y;
+	i = 0x5f3759df - (i >> 1);
+	y = *(double *)&i;
+	y = y * (threehalves - (x2 * y * y));
+
+	return y;
+}
 // template for n-bodies
 class Body {
 private:
@@ -62,17 +74,6 @@ void Body::update_position(const double timestep) {
 	this->z += timestep * this->vz;
 }
 
-// fast inverse square-root algorithm
-double inv_rsqrt(double n) {
-	const double threehalves = 1.5F;
-	double x2 = n * 0.5F;
-	double y = n;
-	long i = *(long *)&y;
-	i = 0x5f3759df - (i >> 1);
-	y = *(double *)&i;
-	y = y * (threehalves - (x2 * y * y));
 
-	return y;
-}
 
 #endif

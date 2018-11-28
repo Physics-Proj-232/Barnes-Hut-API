@@ -27,10 +27,15 @@ class BarnesHutNode
 	
 	//stars
 	std::vector<Body*>		*bodies;
+	double					totalmass;
+	double					cx;
+	double					cy;
+	double					cz; //center of gravity coordinates
 	
 	size_t			bodystart;
 	size_t			bodyend;
 	
+	void	center_of_mass();
 	void	create_children(BarnesHutNode *cursor, size_t limit);
 	void	adjust_velocity(size_t i, const double timestep);
 	void	adjust_velocity_node(size_t i, const double timestep, BarnesHutNode suboctant);
