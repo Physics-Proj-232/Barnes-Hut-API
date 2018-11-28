@@ -9,43 +9,43 @@ using namespace std;
 class SpaceBody
 {
     private:
-    float xpos, ypos, zpos;
-    float velx, vely ,velz;
-    float mass;
+    double x, y, z;
+    double vx, vy ,vz;
+    double mass;
 
     public:
     SpaceBody ()
     {
-        xpos = 0;
-        ypos = 0;
-        zpos = 0;
-        velx = 0;
-        vely = 0;
-        velz = 0;
+        x = 0;
+        y = 0;
+        z = 0;
+        vx = 0;
+        vy = 0;
+        vz = 0;
         mass = 0;
     }
 
-    SpaceBody(float x, float y, float z, float vx, float vy, float vz, float m)
+    SpaceBody(double x, double y, double z, double vx, double vy, double vz, double m)
     {
-        xpos = x;
-        ypos = y;
-        zpos = z;
-        velx = vx;
-        vely = vy;
-        velz = vz;
-        mass = m;
+        this->x = x;
+        this->y = y;
+        this->z = z;
+        this->vx = vx;
+        this->vy = vy;
+        this->vz = vz;
+        this->mass = m;
     }
 
     //print function to test input function
     void printBody()
     {
-        cout << xpos << " " << ypos << " " << zpos << " " << velx << " " << vely << " " << velz << " " << mass << " ";
+        cout << x << " " << y << " " << z << " " << vx << " " << vy << " " << vz << " " << mass << " ";
     }
 
     void inputdata(string filename){
-        float tmpx, tmpy, tmpz; //temporary position variables
-        float tmpvx, tmpvy, tmpvz; //temporary velocity variables
-        float tmpmass; //temporary mass variable
+        double tmpx, tmpy, tmpz; //temporary position variables
+        double tmpvx, tmpvy, tmpvz; //temporary velocity variables
+        double tmpmass; //temporary mass variable
 
         ifstream inputfile;  //name input file
         inputfile.open(filename.c_str());  //open file
