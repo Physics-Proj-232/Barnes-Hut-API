@@ -9,7 +9,7 @@ BarnesHutNode::void OutputData()
     ofstream outputdata;
     outputdata.open("outputdata.txt");
     if(outputdata)
-    {   for()
+    {   
             for(int j = this->bodystart; j <= this->bodyend; j++)
             {
                 outputdata << this->bodies[j]->x;
