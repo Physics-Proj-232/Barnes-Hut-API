@@ -75,23 +75,23 @@ void updateScale(float mass)
     {
     if( mass > 0 && mass <= 10 )
         obj.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-    if( mass > 10 && mass <= 20 )
+    else if( mass > 10 && mass <= 20 )
         obj.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-    if( mass > 20 && mass <= 30 )
+    else if( mass > 20 && mass <= 30 )
         obj.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
-    if( mass > 30 && mass <= 40 )
+    else if( mass > 30 && mass <= 40 )
         obj.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
-    if( mass > 40 && mass <= 50 )
+    else if( mass > 40 && mass <= 50 )
         obj.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-    if( mass > 50 && mass <= 60 )
+    else if( mass > 50 && mass <= 60 )
         obj.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
-    if( mass > 60 && mass <= 70 )
+    else if( mass > 60 && mass <= 70 )
         obj.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
-    if( mass > 70 && mass <= 80 )
+    else if( mass > 70 && mass <= 80 )
         obj.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
-    if( mass > 80 && mass <= 90 )
+    else if( mass > 80 && mass <= 90 )
         obj.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
-    if( mass > 90 && mass <= 100 )
+    else if( mass > 90 && mass <= 100 )
         obj.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
     }
 
