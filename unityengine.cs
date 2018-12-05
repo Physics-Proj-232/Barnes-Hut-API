@@ -8,7 +8,11 @@ public class Sphere
 
 {
 
-public
+private:
+     float tmpx, tmpy, tmpz;
+    float tmpvx, tmpvy, tmpvz;
+    float tmpmass;
+public:
 
 //Create a sphere object
 void Func()
@@ -19,10 +23,6 @@ GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 //Function should retrieve the variables for mass, and x, y, z position and velocity from an input file
 void retrieveData()
 {
-    float tmpx, tmpy, tmpz;
-    float tmpvx, tmpvy, tmpvz;
-    float tmpmass;
-
     ifstream inputfile;
     inputfile.open("sample.txt");
     if(inputfile){
@@ -42,19 +42,6 @@ void retrieveData()
     }
 }
 
-public class Makebody : MonoBehaviour {
-
-// Use this for initialization
-void Start ()
-    {
-        Sphere sawyer = new Sphere();
-        sawyer.Func();
-
-    }
-
-// Update is called once per frame
-void Update (float x, float y, float z, float vx, float vy, float vz, float mass ) {
-
 //calculates velocity per frame(VPF) to increment the movement of the body
 void findVPF(float vx, float vy, float vz)
     {
@@ -63,12 +50,7 @@ void findVPF(float vx, float vy, float vz)
     vypf = vy/8;
     vzpf = vz/8;
     }
-
-//change the position of the body based off the VPF and starting position
-void updatePosition(float x, float y, float z, float vxpf, float vypf, float vzpf)
-    {
-        obj.transform.localPosition = new Vector3(x + vxpf, y + vypf, z);
-    }
+    
 
 //set the scale of the body by from mass
 void updateScale(float mass)
@@ -93,6 +75,27 @@ void updateScale(float mass)
         obj.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
     else if( mass > 90 && mass <= 100 )
         obj.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+    }
+}
+
+public class Makebody : MonoBehaviour {
+
+// Use this for initialization
+void Start ()
+    {
+        Sphere sawyer = new Sphere();
+        sawyer.Func();
+
+    }
+
+// Update is called once per frame
+void Update (float x, float y, float z, float vx, float vy, float vz, float mass ) {
+
+
+//change the position of the body based off the VPF and starting position
+void updatePosition(float x, float y, float z, float vxpf, float vypf, float vzpf)
+    {
+        obj.transform.localPosition = new Vector3(x + vxpf, y + vypf, z);
     }
 
 };
