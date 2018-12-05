@@ -9,9 +9,17 @@ BarnesHutNode::void OutputData()
     ofstream outputdata;
     outputdata.open("outputdata.txt");
     if(outputdata)
-    {    for(int i=0; i < 8; i++)
-            {outputdata << this->children[i];
-             outputdata << " ";}
+    {   for()
+            for(int j = this->bodystart; j <= this->bodyend; j++)
+            {
+                outputdata << this->bodies[j]->x;
+                outputdata << this->bodies[j]->y;
+                outputdata << this->bodies[j]->z;
+                outputdata << this->bodies[j]->vx;
+                outputdata << this->bodies[j]->vy;
+                outputdata << this->bodies[j]->vz;
+                outputdata << this->bodies[j]->m;
+            }
     outputdata.close();}
     else
     {
