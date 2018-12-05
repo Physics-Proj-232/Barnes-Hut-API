@@ -3,7 +3,7 @@
 #include <fstream>
 using namespace std;
 
-//This function writes the data stored in the array "children" to a test file
+//This function writes the variables stored in a body object as it itterates through a node of bodies
 BarnesHutNode::void OutputData()
 {
     ofstream outputdata;
