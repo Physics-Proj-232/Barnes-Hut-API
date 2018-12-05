@@ -7,6 +7,9 @@
 #include <vector>
 #include <cstdlib>
 
+// gravitational constant
+const double G = 6.673e-11;
+
 class BarnesHutNode
 {
 	public:
@@ -27,15 +30,16 @@ class BarnesHutNode
 	
 	//stars
 	std::vector<Body*>		*bodies;
+	//center of gravity coordinates
 	double					totalmass;
 	double					cx;
 	double					cy;
-	double					cz; //center of gravity coordinates
+	double					cz;
 	
 	size_t			bodystart;
 	size_t			bodyend;
 	
-	void	center_of_mass();
+	void	center_of_gravity();
 	void	create_children(BarnesHutNode *cursor, size_t limit);
 	void	adjust_velocity(size_t i, const double timestep);
 	void	adjust_velocity_node(size_t i, const double timestep, BarnesHutNode suboctant);

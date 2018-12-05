@@ -1,4 +1,5 @@
 #include <barneshut.h>
+#include <cmath> //copysign()
 
 BarnesHutNode::BarnesHutNode()
 {
@@ -74,33 +75,51 @@ BarnesHutNode::BarnesHutNode	*create_octree(size_t limit, std::vector<Body*> *ma
 	return (root);
 }
 
-BarnesHutNode::void			center_of_mass()
+BarnesHutNode::void			center_of_gravity()
 {
 	size_t sumx = 0;
 	size_t sumy = 0;
 	size_t sumz = 0;
-	size_t totalmass = 0;
+	totalmass = 0;
+
+	//sums of position * mass of each respective body
 	for (size_t i = this->bodystart; i < this->bodyend; i++)
 	{
 		sumx += (bodies[i]->x * bodies[i]->mass);
 		sumy += (bodies[i]->y * bodies[i]->mass);
 		sumz += (bodies[i]->z * bodies[i]->mass);
-	}
-	for (size_t j = this->bodystart; j < this->bodyend; j++)
-	{
 		totalmass += bodies[i]->mass;
 	}
+	
 	this->cx = sumx / totalmass;
 	this->cy = sumy / totalmass;
 	this->cz = sumz / totalmass;
 }
 
-BarnesHutNode::void			adjust_velocity_node(size_t i, const double timestep, BarnesHutNode suboctant)
+BarnesHutNode::void			adjust_velocity_node(size_t i, const double softening, const double timestep, BarnesHutNode suboctant)
 {
+	double	nodefx;
+	double	nodefy;
+	double	nodefz;
 
+	double dx = copysign(suboctant->cx - bodies[i]->x, 1);
+	double dy = copysign(suboctant->cy - bodies[i]->y, 1);
+	double dz = copysign(suboctant->cz - bodies[i]->z, 1);
+
+	double dist_squared = dx * dx + dy * dy + dz * dz + softening;
+	double inv_dist_cube = Body::inv_rsqrt(dist_squared) * Body::inv_rsqrt(dist_squared) * Body::inv_rsqrt(dist_squared);
+	double s = G * totalmass * i->mass * inv_dist_cube;
+
+	nodefx += s * dx / sqrt(dist_squared);
+	nodefy += s * dy / sqrt(dist_squared);
+	nodefz += s * dz / sqrt(dist_squared);
+
+	i->vx += (timestep * nodefx) / i->mass;
+	i->vy += (timestep * nodefy) / i->mass;
+	i->vz += (timestep * nodefz) / i->mass;
 }
 
-BarnesHutNode::void			adjust_velocity(size_t i, const double timestep)
+BarnesHutNode::void			adjust_velocity(size_t i, const double softening, const double timestep)
 {
 	//adjust velocity based on all particles within the same node
 	for (size_t j = this->bodystart; j < this->bodyend; j++)
@@ -119,7 +138,7 @@ BarnesHutNode::void			adjust_velocity(size_t i, const double timestep)
 		{
 			if (cursor->parent->children[j] != cursor)
 			{
-				cursor->adjust_velocity_node(i, timestep, cursor->parent->children[j]); //compare the suboctant that contains i to all other suboctants within the same octant
+				cursor->adjust_velocity_node(i, softening, timestep, cursor->parent->children[j]); //compare the suboctant that contains i to all other suboctants within the same octant
 			}
 		}
 		cursor = parent; //change our suboctant to the octant that contained the suboctant

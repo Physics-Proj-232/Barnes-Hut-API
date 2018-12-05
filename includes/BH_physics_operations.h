@@ -1,23 +1,11 @@
 #ifndef PHYSICS
 # define PHYSICS
 
-#include <cmath> // copysign(), sqrtf()
+#include <cmath> // copysign(), sqrt()
 
 // gravitational constant
 const double G = 6.673e-11;
 
-// fast inverse square-root algorithm
-double inv_rsqrt(double n) {
-	const double threehalves = 1.5F;
-	double x2 = n * 0.5F;
-	double y = n;
-	long i = *(long *)&y;
-	i = 0x5f3759df - (i >> 1);
-	y = *(double *)&i;
-	y = y * (threehalves - (x2 * y * y));
-
-	return y;
-}
 // template for n-bodies
 class Body {
 private:
@@ -36,6 +24,8 @@ public:
 		this->vz = vz;
 		this->mass = mass;
 	}
+
+	static double inv_rsqrt(double n);
 	void add_force(Body*, const double);
 	void update_force(const double);
 };
@@ -47,19 +37,18 @@ void Body::add_force(Body *obj, const double softening, const double timestep) {
 	double	fy;
 	double	fz;
 
-	double dx = obj->x - this->x;
-	double dy = obj->y - this->y;
-	double dz = obj->z - this->z;
+	double dx = copysign(obj->x - this->x, 1);
+	double dy = copysign(obj->y - this->y, 1);
+	double dz = copysign(obj->z - this->z, 1);
 	double dmass = copysign(1, this->mass);
 
 	double dist_squared = dx * dx + dy * dy + dz * dz + softening;
-	double inv_dist = inv_rsqrt(dist_squared);
-	double inv_dist_cube = inv_dist * inv_dist * inv_dist;
+	double inv_dist_cube = inv_rsqrt(dist_squared) * inv_rsqrt(dist_squared) * inv_rsqrt(dist_squared);
 	double s = G * this->mass * obj->mass * inv_dist_cube;
 
-	fx += s * dx / sqrtf(dist_squared);
-	fy += s * dy / sqrtf(dist_squared);
-	fz += s * dz / sqrtf(dist_squared);
+	fx += s * dx / sqrt(dist_squared);
+	fy += s * dy / sqrt(dist_squared);
+	fz += s * dz / sqrt(dist_squared);
 	
 	this->vx += (timestep * fx) / this->mass;
 	this->vy += (timestep * fy) / this->mass;
@@ -74,6 +63,16 @@ void Body::update_position(const double timestep) {
 	this->z += timestep * this->vz;
 }
 
+// fast inverse square-root algorithm
+double Body::inv_rsqrt(double n) {
+	const double threehalves = 1.5F;
+	double x2 = n * 0.5F;
+	double y = n;
+	long i = *(long *)&y;
+	i = 0x5f3759df - (i >> 1);
+	y = *(double *)&i;
+	y = y * (threehalves - (x2 * y * y));
 
-
+	return y;
+}
 #endif
