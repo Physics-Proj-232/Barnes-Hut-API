@@ -50,6 +50,8 @@ class BarnesHutNode
 	Body	get_physical_center(void);
 	
 	BarnesHutNode	*endtree(size_t i);
+	
+	void OutputData();
 
 };
 
