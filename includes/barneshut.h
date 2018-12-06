@@ -44,6 +44,8 @@ class BarnesHutNode
 	void	adjust_velocity(size_t i, const double timestep);
 	void	adjust_velocity_node(size_t i, const double timestep, BarnesHutNode suboctant);
 	void	update(const double timestep);
+	void	sort_bodies();
+	Body	get_physical_center(void);
 	
 	BarnesHutNode	*endtree(size_t i);
 

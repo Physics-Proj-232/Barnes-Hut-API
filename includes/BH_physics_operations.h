@@ -9,11 +9,15 @@ const double G = 6.673e-11;
 // template for n-bodies
 class Body {
 private:
+	
+
+public:
+
 	double mass;
 	double x, y, z;    // position
 	double vx, vy, vz; // velocity
-
-public:
+	char	octant = 0;
+	
 	Body(double x,  double y,  double z, 
 		   double vx, double vy, double vz, double mass) {
 		this->x = x;
@@ -28,6 +32,9 @@ public:
 	static double inv_rsqrt(double n);
 	void add_force(Body*, const double);
 	void update_force(const double);
+	void	set_x(int x);
+	void	set_y(int y);
+	void	set_z(int z);
 };
 
 // @param softening prevents divergence (going to infinity)
@@ -74,5 +81,20 @@ double Body::inv_rsqrt(double n) {
 	y = y * (threehalves - (x2 * y * y));
 
 	return y;
+}
+
+void	Body::set_x(int x)
+{
+	this->x = x;
+}
+
+void	Body::set_y(int x)
+{
+	this->y = x;
+}
+
+void	Body::set_z(int x)
+{
+	this->z = x;
 }
 #endif

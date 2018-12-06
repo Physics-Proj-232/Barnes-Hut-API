@@ -24,7 +24,7 @@ BarnesHutNode::BarnesHutNode(size_t lower, size_t upper, BarnesHutNode *parent)
 	}
 }
 
-BarnesHutNode::size_t	getdepth()
+size_t	BarnesHutNode::getdepth()
 {
 	size_t			depth = 0;
 	BarnesHutNode	*node = this;
@@ -38,24 +38,13 @@ BarnesHutNode::size_t	getdepth()
 	return (depth);
 }
 
-BarnesHutNode::void		create_children(BarnesHutNode *cursor, size_t limit)
+void BarnesHutNode::create_children(BarnesHutNode *cursor, size_t limit)
 {
-		size_t	lower;
-		size_t	upper;
-		lower = cursor->bodystart;
 		for (int l = 0; l < 8; l++)
 		{
-			if (l != 7)
-			{
-				upper = ((l + 1) * (cursor->bodyend - cursor->bodystart))/8 //our upper bound is l/8th of the parent
-			}
-			else
-			{
-				upper = cursor->bodyend; //the last child should have an upper limit of the end of the parent
-			}
 			cursor->children[l] = new BarnesHutNode(lower, upper, cursor);
-			lower = upper + 1;
 		}
+		this->sort_bodies();
 		if (cursor->children[0]->getdepth() < limit)
 		{
 			for (int l = 0; l < 8; l++)
@@ -65,7 +54,7 @@ BarnesHutNode::void		create_children(BarnesHutNode *cursor, size_t limit)
 		}
 }
 
-BarnesHutNode::BarnesHutNode	*create_octree(size_t limit, std::vector<Body*> *masses)
+BarnesHutNode*	BarnesHutNode::create_octree(size_t limit, std::vector<Body*> *masses)
 {
 	BarnesHutNode	*root = new BarnesHutNode();
 	
@@ -75,7 +64,7 @@ BarnesHutNode::BarnesHutNode	*create_octree(size_t limit, std::vector<Body*> *ma
 	return (root);
 }
 
-BarnesHutNode::void			center_of_gravity()
+void	BarnesHutNode::center_of_gravity()
 {
 	size_t sumx = 0;
 	size_t sumy = 0;
@@ -96,7 +85,7 @@ BarnesHutNode::void			center_of_gravity()
 	this->cz = sumz / totalmass;
 }
 
-BarnesHutNode::void			adjust_velocity_node(size_t i, const double softening, const double timestep, BarnesHutNode suboctant)
+void	BarnesHutNode::adjust_velocity_node(size_t i, const double softening, const double timestep, BarnesHutNode suboctant)
 {
 	double	nodefx;
 	double	nodefy;
@@ -119,7 +108,7 @@ BarnesHutNode::void			adjust_velocity_node(size_t i, const double softening, con
 	i->vz += (timestep * nodefz) / i->mass;
 }
 
-BarnesHutNode::void			adjust_velocity(size_t i, const double softening, const double timestep)
+void	BarnesHutNode::adjust_velocity(size_t i, const double softening, const double timestep)
 {
 	//adjust velocity based on all particles within the same node
 	for (size_t j = this->bodystart; j < this->bodyend; j++)
@@ -145,7 +134,7 @@ BarnesHutNode::void			adjust_velocity(size_t i, const double softening, const do
 	}
 }
 
-BarnesHutNode::BarnesHutNode	*endtree(size_t i)
+BarnesHutNode*	BarnesHutNode::endtree(size_t i)
 {
 	BarnesHutNode	cursor = this;
 	
@@ -163,7 +152,7 @@ BarnesHutNode::BarnesHutNode	*endtree(size_t i)
 	return (cursor);
 }
 
-BarnesHutNode::void				iterate(double timestep)
+void	BarnesHutNode::iterate(double timestep)
 {
 	timestep *= SCALING; //scaling, change as necessary
 	
@@ -174,11 +163,101 @@ BarnesHutNode::void				iterate(double timestep)
 	this->update(timestep);
 }
 
-BarnesHutNode::void				update(const double timestep)
+void	BarnesHutNode::update(const double timestep)
 {
 	//update the position of all our particles
 	for (size_t i = this->bodystart; i < this->bodyend; i++)
 	{
 		this->bodies[i]->update_position(timestep);
+	}
+}
+
+Body	BarnesHutNode::get_physical_center()
+{
+	Body	ret;
+	
+	ret.set_x(0);
+	ret.set_y(0);
+	ret.set_z(0);
+	
+	size_t	i = this->bodystart;
+	
+	while (i <= this->bodyend)
+	{
+		ret.x += this->bodies[i]->x;
+		ret.y += this->bodies[i]->y;
+		ret.z += this->bodies[i]->z;
+		i++;
+	}
+	
+	ret.x /= (this->bodyend - this->bodystart + 1);
+	ret.y /= (this->bodyend - this->bodystart + 1);
+	ret.z /= (this->bodyend - this->bodystart + 1);
+	
+	return (ret);
+}
+
+size_t	BarnesHutNode::find_end(size_t start, size_t octant)
+{
+	while (start <= this->bodyend)
+	{
+		if (this->bodies[start]->octant != octant)
+			break ;
+		start++;
+	}
+	
+	return (start - 1);
+}
+
+void	BarnesHutNode::sort_bodies()
+{
+	double	x;
+	double	y;
+	double	z;
+	
+	Body	center = this->get_physical_center();
+	
+	size_t	i = this->bodystart;
+	
+	while (i <= this->bodyend)
+	{
+		x = this->bodies[i]->x - center.x;
+		y = this->bodies[i]->y - center.y;
+		z = this->bodies[i]->z - center.z;
+		
+		if (x >= 0.0 && y >= 0.0 && z >= 0.0)
+            this->bodies[i]->octant = 1;
+        else if (x < 0.0 && y >= 0.0 && z >= 0.0)
+            this->bodies[i]->octant = 2;
+        else if (x < 0.0 && y < 0.0 && z >= 0.0)
+            this->bodies[i]->octant = 3;
+        else if (x >= 0.0 && y < 0.0 && z >= 0.0)
+            this->bodies[i]->octant = 4;
+        else if (x >= 0.0 && y >= 0.0 && z < 0.0)
+            this->bodies[i]->octant = 5;
+        else if (x < 0.0 && y >= 0.0 && z < 0.0)
+            this->bodies[i]->octant = 6;
+        else if (x < 0.0 && y < 0.0 && z < 0.0)
+            this->bodies[i]->octant = 7;
+        else if (x >= 0.0 && y < 0.0 && z < 0.0)
+            this->bodies[i]->octant = 8;
+		i++;
+	}
+	
+	//quicksort here
+	
+	i = 0;
+	while (i < 8)
+	{
+		for (size_t j = 0; j < this->bodyend; j++)
+		{
+			if (this->bodies[j]->octant == i + 1)
+			{
+				this->children[i]->bodystart = j;
+				this->children[i]->bodyend = find_end(j, i + 1);
+				break ;
+			}
+		}
+		i++;
 	}
 }
