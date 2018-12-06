@@ -11,13 +11,13 @@ BarnesHutNode::BarnesHutNode()
 	}
 }
 
-BarnesHutNode::BarnesHutNode(size_t lower, size_t upper, BarnesHutNode *parent)
+BarnesHutNode::BarnesHutNode(size_t lower, size_t upper, BarnesHutNode *parent, int octant)
 {
 	this->parent = parent;
 	this->bodystart = lower;
 	this->bodyend = upper;
 	this->bodies = parent->bodies;
-	
+	this->octant = octant;
 	for (int x = 0; x < 8; x++)
 	{
 		this->children[x] = 0;
@@ -42,7 +42,7 @@ void BarnesHutNode::create_children(BarnesHutNode *cursor, size_t limit)
 {
 		for (int l = 0; l < 8; l++)
 		{
-			cursor->children[l] = new BarnesHutNode(lower, upper, cursor);
+			cursor->children[l] = new BarnesHutNode(this->bodystart, this->bodyend, cursor, l + 1);
 		}
 		this->sort_bodies();
 		if (cursor->children[0]->getdepth() < limit)
@@ -141,7 +141,7 @@ BarnesHutNode*	BarnesHutNode::endtree(size_t i)
 	int l = 0;
 	while (cursor->children[0] && l < 8)
 	{
-		if (i >= cursor->children[l]->bodystart && i <= cursor->children[l]->bodyend)
+		if (i == cursor->children[l].octant)
 		{
 			cursor = cursor->children[l];
 			l = 0;

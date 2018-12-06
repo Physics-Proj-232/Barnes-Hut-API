@@ -15,7 +15,7 @@ class BarnesHutNode
 	public:
 	
 	BarnesHutNode();
-	BarnesHutNode(size_t lower, size_t upper, BarnesHutNode *parent);
+	BarnesHutNode(size_t lower, size_t upper, BarnesHutNode *parent, int octant);
 	
 	void	iterate(double timestep);
 	
