@@ -12,6 +12,7 @@ private:
      float tmpx, tmpy, tmpz;
     float tmpvx, tmpvy, tmpvz;
     float tmpmass;
+     float vxpf, vxypf, vzpf;
 public:
 
 //Create a sphere object
@@ -45,7 +46,6 @@ void retrieveData()
 //calculates velocity per frame(VPF) to increment the movement of the body
 void findVPF(float vx, float vy, float vz)
     {
-    float vxpf, vxypf, vzpf;
     vxpf = vx/8;
     vypf = vy/8;
     vzpf = vz/8;
@@ -76,6 +76,13 @@ void updateScale(float mass)
     else if( mass > 90 && mass <= 100 )
         obj.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
     }
+     
+ //change the position of the body based off the VPF and starting position
+void updatePosition(float x, float y, float z, float vxpf, float vypf, float vzpf)
+    {
+        obj.transform.localPosition = new Vector3(x + vxpf, y + vypf, z);
+    }
+
 }
 
 public class Makebody : MonoBehaviour {
@@ -85,18 +92,16 @@ void Start ()
     {
         Sphere sawyer = new Sphere();
         sawyer.Func();
+        sawyer.updatescale(tmpmass);
+        sawyer.findVPF(tmpvx, tmpvy, tmpvz);
+        sawyer.Update(tmpx, tmpy, tmpz, vpfx, vpfy, vpfz);
 
     }
 
 // Update is called once per frame
-void Update (float x, float y, float z, float vx, float vy, float vz, float mass ) {
+void Update (float x, float y, float z, float vx, float vy, float vz) {
 
-
-//change the position of the body based off the VPF and starting position
-void updatePosition(float x, float y, float z, float vxpf, float vypf, float vzpf)
-    {
-        obj.transform.localPosition = new Vector3(x + vxpf, y + vypf, z);
-    }
+sawyer.updatePosition(x, y, z, vx, vy, vz);
 
 };
 
