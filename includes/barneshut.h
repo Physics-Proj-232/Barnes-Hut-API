@@ -1,29 +1,58 @@
 #ifndef BARNESHUT
 # define BARNESHUT
 
+#define SCALING 1.0 //decrease this to improve the accuracy of the simulation, it represents how many simulation seconds correspond to seconds
 
-class Body
-{
-	//position;
-	double	x;
-	double	y;
-	double	z;
+#include <BH_physics_operations.h>
+#include <vector>
+#include <cstdlib>
 
-	double	mass;
-
-	//velocity
-	double	vx;
-	double	vy;
-	double	vz;
-}
+// gravitational constant
+const double G = 6.673e-11;
 
 class BarnesHutNode
 {
+	public:
+	
+	BarnesHutNode();
+	BarnesHutNode(size_t lower, size_t upper, BarnesHutNode *parent, int octant);
+	
+	void	iterate(double timestep);
+	
+	size_t	getdepth();
+	
+	static BarnesHutNode	*create_octree(size_t limit, std::vector<Body*> *masses);
+	
+	protected:
+	
 	BarnesHutNode	*children[8];
 	BarnesHutNode	*parent;
 	
 	//stars
-	Body		*bodies;
+	std::vector<Body*>		*bodies;
+	//center of gravity coordinates
+	double					totalmass;
+	double					cx;
+	double					cy;
+	double					cz;
+	
+	size_t			bodystart;
+	size_t			bodyend;
+	
+	void	center_of_gravity();
+	void	create_children(BarnesHutNode *cursor, size_t limit);
+	void	adjust_velocity(size_t i, const double timestep);
+	void	adjust_velocity_node(size_t i, const double timestep, BarnesHutNode suboctant);
+	void	update(const double timestep);
+	void	sort_bodies();
+	
+	size_t	find_end(size_t start, size_t octant);
+	Body	get_physical_center(void);
+	
+	BarnesHutNode	*endtree(size_t i);
+	
+	void OutputData();
+
 };
 
 #endif
