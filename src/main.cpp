@@ -1,6 +1,5 @@
-#include <barneshut.h>
-#include <spacebody.h>
-#include <BH_physics_operations.h>
+#include "barneshut.h"
+#include "spacebody.h"
 
 int		main(void)
 {

@@ -1,4 +1,5 @@
-#include <barneshut.h>
+#include "barneshut.h"
+#include "BH_physics_operations.h"
 #include <iostream>
 #include <fstream>
 #include <cmath> //copysign()
@@ -88,37 +89,38 @@ void	BarnesHutNode::center_of_gravity()
 	this->cz = sumz / totalmass;
 }
 
-void	BarnesHutNode::adjust_velocity_node(size_t i, const double softening, const double timestep, BarnesHutNode suboctant)
+void	BarnesHutNode::adjust_velocity_node(size_t i, const double softening, const double timestep, BarnesHutNode *suboctant)
 {
 	double	nodefx;
 	double	nodefy;
 	double	nodefz;
 
-	double dx = copysign(suboctant->cx - bodies[i]->x, 1);
-	double dy = copysign(suboctant->cy - bodies[i]->y, 1);
-	double dz = copysign(suboctant->cz - bodies[i]->z, 1);
+	double dx = copysign(suboctant->cx - (*bodies)[i]->x, 1);
+	double dy = copysign(suboctant->cy - (*bodies)[i]->y, 1);
+	double dz = copysign(suboctant->cz - (*bodies)[i]->z, 1);
 
 	double dist_squared = dx * dx + dy * dy + dz * dz + softening;
 	double inv_dist_cube = Body::inv_rsqrt(dist_squared) * Body::inv_rsqrt(dist_squared) * Body::inv_rsqrt(dist_squared);
-	double s = G * totalmass * i->mass * inv_dist_cube;
+	double s = G * totalmass * (*bodies)[i]->mass * inv_dist_cube;
 
 	nodefx += s * dx / sqrt(dist_squared);
 	nodefy += s * dy / sqrt(dist_squared);
 	nodefz += s * dz / sqrt(dist_squared);
 
-	i->vx += (timestep * nodefx) / i->mass;
-	i->vy += (timestep * nodefy) / i->mass;
-	i->vz += (timestep * nodefz) / i->mass;
+	(*bodies)[i]->vx += (timestep * nodefx) / (*bodies)[i]->mass;
+	(*bodies)[i]->vy += (timestep * nodefy) / (*bodies)[i]->mass;
+	(*bodies)[i]->vz += (timestep * nodefz) / (*bodies)[i]->mass;
 }
 
 void	BarnesHutNode::adjust_velocity(size_t i, const double softening, const double timestep)
 {
+	BarnesHutNode	*cursor;
 	//adjust velocity based on all particles within the same node
 	for (size_t j = this->bodystart; j < this->bodyend; j++)
 	{
 		if (i != j)
 		{
-			(*this->bodies)[i]->add_force(this->bodies[j], 0.01, timestep);
+			(*this->bodies)[i]->add_force((*this->bodies)[j], 0.01, timestep);
 		}
 	}
 	
@@ -139,12 +141,12 @@ void	BarnesHutNode::adjust_velocity(size_t i, const double softening, const doub
 
 BarnesHutNode*	BarnesHutNode::endtree(size_t i)
 {
-	BarnesHutNode	cursor = this;
+	BarnesHutNode	*cursor = this;
 	
 	int l = 0;
 	while (cursor->children[0] && l < 8)
 	{
-		if (i == cursor->children[l].octant)
+		if (i == cursor->children[l]->octant)
 		{
 			cursor = cursor->children[l];
 			l = 0;
@@ -161,7 +163,7 @@ void	BarnesHutNode::iterate(double timestep)
 	
 	for (size_t i = this->bodystart; i < this->bodyend; i++)
 	{
-		this->endtree(i)->adjust_velocity(i);
+		this->endtree(i)->adjust_velocity(i, timestep, timestep);
 	}
 	this->update(timestep);
 }
@@ -171,7 +173,7 @@ void	BarnesHutNode::update(const double timestep)
 	//update the position of all our particles
 	for (size_t i = this->bodystart; i < this->bodyend; i++)
 	{
-		this->bodies[i]->update_position(timestep);
+		(*this->bodies)[i]->update_position(timestep);
 	}
 	this->sort_bodies();
 }
@@ -288,3 +290,4 @@ void BarnesHutNode::OutputData()
 	}
 
 }
+

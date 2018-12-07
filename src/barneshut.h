@@ -2,13 +2,11 @@
 # define BARNESHUT
 
 #define SCALING 1.0 //decrease this to improve the accuracy of the simulation, it represents how many simulation seconds correspond to seconds
-
-#include <BH_physics_operations.h>
+#include "BH_physics_operations.h"
 #include <vector>
 #include <cstdlib>
 
 // gravitational constant
-const double G = 6.673e-11;
 
 class BarnesHutNode
 {
@@ -44,7 +42,7 @@ class BarnesHutNode
 	void	center_of_gravity();
 	void	create_children(BarnesHutNode *cursor, size_t limit);
 	void	adjust_velocity(size_t i, const double softening, const double timestep);
-	void	adjust_velocity_node(size_t i, const double softening, const double timestep, BarnesHutNode suboctant);
+	void	adjust_velocity_node(size_t i, const double softening, const double timestep, BarnesHutNode *suboctant);
 	void	update(const double timestep);
 	void	sort_bodies();
 	
