@@ -43,7 +43,7 @@ class SpaceBody
         cout << x << " " << y << " " << z << " " << vx << " " << vy << " " << vz << " " << mass << " ";
     }
 
-    static std::vector<Body*>	inputdata(string filename){
+	std::vector<Body*>	*inputdata(string filename){
         double tmpx, tmpy, tmpz; //temporary position variables
         double tmpvx, tmpvy, tmpvz; //temporary velocity variables
         double tmpmass; //temporary mass variable

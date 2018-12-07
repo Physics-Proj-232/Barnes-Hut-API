@@ -1,5 +1,9 @@
 #include <barneshut.h>
+#include <iostream>
+#include <fstream>
 #include <cmath> //copysign()
+
+using namespace std;
 
 BarnesHutNode::BarnesHutNode()
 {
@@ -56,12 +60,11 @@ void BarnesHutNode::create_children(BarnesHutNode *cursor, size_t limit)
 
 BarnesHutNode*	BarnesHutNode::create_octree(size_t limit, std::vector<Body*> *masses)
 {
-	BarnesHutNode	*root = new BarnesHutNode();
 	
-	root->bodies = masses;
-	create_children(root);
-	
-	return (root);
+	this->bodies = masses;
+	this->create_children(this, limit);
+
+	return (this);
 }
 
 void	BarnesHutNode::center_of_gravity()
@@ -74,10 +77,10 @@ void	BarnesHutNode::center_of_gravity()
 	//sums of position * mass of each respective body
 	for (size_t i = this->bodystart; i < this->bodyend; i++)
 	{
-		sumx += (bodies[i]->x * bodies[i]->mass);
-		sumy += (bodies[i]->y * bodies[i]->mass);
-		sumz += (bodies[i]->z * bodies[i]->mass);
-		totalmass += bodies[i]->mass;
+		sumx += ((*bodies)[i]->x * (*bodies)[i]->mass);
+		sumy += ((*bodies)[i]->y * (*bodies)[i]->mass);
+		sumz += ((*bodies)[i]->z * (*bodies)[i]->mass);
+		totalmass += (*bodies)[i]->mass;
 	}
 	
 	this->cx = sumx / totalmass;
@@ -115,7 +118,7 @@ void	BarnesHutNode::adjust_velocity(size_t i, const double softening, const doub
 	{
 		if (i != j)
 		{
-			this->bodies[i]->add_force(this->bodies[j], 0.01, timestep);
+			(*this->bodies)[i]->add_force(this->bodies[j], 0.01, timestep);
 		}
 	}
 	
@@ -175,19 +178,15 @@ void	BarnesHutNode::update(const double timestep)
 
 Body	BarnesHutNode::get_physical_center()
 {
-	Body	ret;
-	
-	ret.set_x(0);
-	ret.set_y(0);
-	ret.set_z(0);
+	Body	ret = Body(0, 0, 0, 0, 0, 0, 0);
 	
 	size_t	i = this->bodystart;
 	
 	while (i <= this->bodyend)
 	{
-		ret.x += this->bodies[i]->x;
-		ret.y += this->bodies[i]->y;
-		ret.z += this->bodies[i]->z;
+		ret.x += (*this->bodies)[i]->x;
+		ret.y += (*this->bodies)[i]->y;
+		ret.z += (*this->bodies)[i]->z;
 		i++;
 	}
 	
@@ -202,7 +201,7 @@ size_t	BarnesHutNode::find_end(size_t start, size_t octant)
 {
 	while (start <= this->bodyend)
 	{
-		if (this->bodies[start]->octant != octant)
+		if ((*this->bodies)[start]->octant != octant)
 			break ;
 		start++;
 	}
@@ -222,26 +221,26 @@ void	BarnesHutNode::sort_bodies()
 	
 	while (i <= this->bodyend)
 	{
-		x = this->bodies[i]->x - center.x;
-		y = this->bodies[i]->y - center.y;
-		z = this->bodies[i]->z - center.z;
+		x = (*this->bodies)[i]->x - center.x;
+		y = (*this->bodies)[i]->y - center.y;
+		z = (*this->bodies)[i]->z - center.z;
 		
 		if (x >= 0.0 && y >= 0.0 && z >= 0.0)
-            this->bodies[i]->octant = 1;
+			(*this->bodies)[i]->octant = 1;
         else if (x < 0.0 && y >= 0.0 && z >= 0.0)
-            this->bodies[i]->octant = 2;
+			(*this->bodies)[i]->octant = 2;
         else if (x < 0.0 && y < 0.0 && z >= 0.0)
-            this->bodies[i]->octant = 3;
+			(*this->bodies)[i]->octant = 3;
         else if (x >= 0.0 && y < 0.0 && z >= 0.0)
-            this->bodies[i]->octant = 4;
+			(*this->bodies)[i]->octant = 4;
         else if (x >= 0.0 && y >= 0.0 && z < 0.0)
-            this->bodies[i]->octant = 5;
+			(*this->bodies)[i]->octant = 5;
         else if (x < 0.0 && y >= 0.0 && z < 0.0)
-            this->bodies[i]->octant = 6;
+			(*this->bodies)[i]->octant = 6;
         else if (x < 0.0 && y < 0.0 && z < 0.0)
-            this->bodies[i]->octant = 7;
+			(*this->bodies)[i]->octant = 7;
         else if (x >= 0.0 && y < 0.0 && z < 0.0)
-            this->bodies[i]->octant = 8;
+			(*this->bodies)[i]->octant = 8;
 		i++;
 	}
 	
@@ -252,7 +251,7 @@ void	BarnesHutNode::sort_bodies()
 	{
 		for (size_t j = 0; j < this->bodyend; j++)
 		{
-			if (this->bodies[j]->octant == i + 1)
+			if ((*this->bodies)[j]->octant == i + 1)
 			{
 				this->children[i]->bodystart = j;
 				this->children[i]->bodyend = find_end(j, i + 1);
@@ -261,4 +260,31 @@ void	BarnesHutNode::sort_bodies()
 		}
 		i++;
 	}
+}
+
+//This function writes the variables stored in a body object as it itterates through a node of bodies
+void BarnesHutNode::OutputData()
+{
+	ofstream outputdata;
+	outputdata.open("outputdata.txt");
+	if (outputdata)
+	{
+		for (int j = this->bodystart; j <= this->bodyend; j++)
+		{
+			outputdata << (*this->bodies)[j]->x;
+			outputdata << (*this->bodies)[j]->y;
+			outputdata << (*this->bodies)[j]->z;
+			outputdata << (*this->bodies)[j]->vx;
+			outputdata << (*this->bodies)[j]->vy;
+			outputdata << (*this->bodies)[j]->vz;
+			outputdata << (*this->bodies)[j]->mass;
+		}
+		outputdata.close();
+	}
+	else
+	{
+		cout << "Error opening file.";
+			outputdata.clear();
+	}
+
 }

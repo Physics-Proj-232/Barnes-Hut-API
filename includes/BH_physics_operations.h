@@ -30,8 +30,8 @@ public:
 	}
 
 	static double inv_rsqrt(double n);
-	void add_force(Body*, const double);
-	void update_force(const double);
+	void add_force(Body*, const double, const double);
+	void update_position(const double);
 	void	set_x(int x);
 	void	set_y(int y);
 	void	set_z(int z);

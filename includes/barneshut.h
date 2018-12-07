@@ -21,7 +21,8 @@ class BarnesHutNode
 	
 	size_t	getdepth();
 	
-	static BarnesHutNode	*create_octree(size_t limit, std::vector<Body*> *masses);
+	BarnesHutNode	*create_octree(size_t limit, std::vector<Body*> *masses);
+	void OutputData();
 	
 	protected:
 	
@@ -35,14 +36,15 @@ class BarnesHutNode
 	double					cx;
 	double					cy;
 	double					cz;
+	int						octant;
 	
 	size_t			bodystart;
 	size_t			bodyend;
 	
 	void	center_of_gravity();
 	void	create_children(BarnesHutNode *cursor, size_t limit);
-	void	adjust_velocity(size_t i, const double timestep);
-	void	adjust_velocity_node(size_t i, const double timestep, BarnesHutNode suboctant);
+	void	adjust_velocity(size_t i, const double softening, const double timestep);
+	void	adjust_velocity_node(size_t i, const double softening, const double timestep, BarnesHutNode suboctant);
 	void	update(const double timestep);
 	void	sort_bodies();
 	
@@ -50,8 +52,6 @@ class BarnesHutNode
 	Body	get_physical_center(void);
 	
 	BarnesHutNode	*endtree(size_t i);
-	
-	void OutputData();
 
 };
 
