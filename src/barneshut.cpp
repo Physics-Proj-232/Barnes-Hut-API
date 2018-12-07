@@ -170,6 +170,7 @@ void	BarnesHutNode::update(const double timestep)
 	{
 		this->bodies[i]->update_position(timestep);
 	}
+	this->sort_bodies();
 }
 
 Body	BarnesHutNode::get_physical_center()
